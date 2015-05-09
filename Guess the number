@@ -1,0 +1,87 @@
+# Testing template for "Guess the number"
+
+###################################################
+# input will come from buttons and an input field
+# all output for the game will be printed in the console
+
+
+import simplegui
+import random
+import math
+
+secret_number = 0
+lower_limit = 0
+higher_limit = 100
+number = 7
+choose_num = 1
+
+def new_game():
+    global secret_number
+    secret_number = random.randrange(lower_limit,higher_limit + 1)
+    if choose_num == 1:
+        button1()
+    else:
+        button2()
+    
+def button1():
+    global choose_num
+    global lower_limit
+    global higher_limit
+    global number
+    choose_num = 1
+    number = 7
+    lower_limit = 0
+    higher_limit = 100
+    print ""    
+    print "New game. Range is from 0 to 100"
+    print "Number of remaining guesses is 7"
+
+def button2():
+    global choose_num
+    global lower_limit
+    global higher_limit
+    global number
+    choose_num = 2
+    number = 10
+    lower_limit = 0
+    higher_limit = 1000
+    print ""    
+    print "New game. Range is from 0 to 1000"
+    print "Number of remaining guesses is 10"
+    
+    
+def input_guess(guess):
+    global number
+    guess = int(guess)
+    number = number -1
+    print ""
+    print "Guess was",guess
+    print "Number of remaining guesses is",number
+
+    if guess > higher_limit or guess < lower_limit:
+        print "Invalid guess"
+        new_game()
+        
+    if guess == secret_number:
+        print "Correct!"
+        new_game()
+    elif guess < secret_number:
+        print "Higher!"
+    elif guess > secret_number:
+        print "Lower!"
+        
+    if number ==0:
+        print "You ran out of guesses.  The number was",secret_number
+        new_game()
+        
+
+        
+frame = simplegui.create_frame("Guess the number",200,200)
+button100 = frame.add_button("Range 0 - 100",button1)
+button1000 = frame.add_button("Range 0 - 1000",button2)
+inp = frame.add_input("Enter the Guess",input_guess,50)
+
+frame.start()
+new_game()
+
+
