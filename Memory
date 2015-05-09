@@ -1,0 +1,101 @@
+# implementation of card game - Memory
+
+import simplegui
+import random
+
+# helper function to initialize globals
+def new_game():
+    global card_list
+    global card_number_list 
+    global prev_card_num
+    global turns
+    global status
+
+    memory_deck = []
+    prev_card_num = []
+    card_number_list = []
+    card_list = []
+    status = 0
+    turns = 0
+    x_position = 25
+    deck_list1 = range(8)
+    deck_list2 = range(8)
+    memory_deck = deck_list1 + deck_list2
+    random.shuffle(memory_deck)
+    for num in memory_deck:
+        card_list.append([num,x_position,'False'])
+        x_position = x_position + 50
+
+def selectedcard(pos):
+    x1 = pos[0]
+    y1 = pos[1]
+    if y1 >= 0 and y1 <= 100:
+        if x1 >= 0 and x1 <= 800:
+            card_num = x1/50
+    return card_num        
+    
+# define event handlers
+def mouseclick(pos):
+    # add game state logic here
+    global status
+    global card_list
+    global card_number_list
+    global prev_card_num
+    global turns
+    card_number = selectedcard(pos)
+    if card_number not in card_number_list:
+        card_number_list.append(card_number)
+        if status == 0:
+            status = 1
+            card_list[card_number][2] = 'True'
+            prev_card_num.append(card_number)
+            turns += 1
+        elif status == 1:
+            status = 2
+            card_list[card_number][2] = 'True'
+            prev_card_num.insert(0,card_number)
+            #turns += 1
+        else:
+            status = 1
+            if card_list[prev_card_num[0]][0] == card_list[prev_card_num[1]][0]:
+                card_list[card_number][2] = 'True'
+                prev_card_num = []
+                prev_card_num.append(card_number)
+                turns += 1
+            else:
+                card_list[prev_card_num[0]][2] = 'False'
+                card_list[prev_card_num[1]][2] = 'False'
+                card_list[card_number][2] = 'True'
+                card_number_list.remove(prev_card_num[0])
+                card_number_list.remove(prev_card_num[1])
+                prev_card_num = []
+                prev_card_num.append(card_number)
+                turns += 1
+
+                
+# cards are logically 50x100 pixels in size    
+def draw(canvas):
+    for card in card_list:
+        if card[2] == 'True':            
+            card_num = str(card[0])
+            canvas.draw_text(card_num,(card[1],70),50,'White')
+        else:
+            canvas.draw_line((card[1], 0), (card[1], 100), 49, 'Green')
+
+    label.set_text("Turns = " + str(turns))        
+        
+# create frame and add a button and labels
+frame = simplegui.create_frame("Memory", 800, 100)
+frame.add_button("Reset", new_game)
+label = frame.add_label("Turns = 0" )
+
+# register event handlers
+frame.set_mouseclick_handler(mouseclick)
+frame.set_draw_handler(draw)
+
+# get things rolling
+new_game()
+frame.start()
+
+
+# Always remember to review the grading rubric
