@@ -4,51 +4,47 @@ import random
 # define global variables
 time = "0:00.0"
 counter = 0
-A = 0
-B = 0
-C = 0
-D = 0
+stopped_number = 0
+stopped_number_whole_second = 0
+previous_counter = 0
 # define helper function format that converts time
 # in tenths of seconds into formatted string A:BC.D
 def format(t):
-    global A,B,C,D
     D = t%10
-    if D == 0:
-        C = C + 1
-        if C == 10:
-            C = 0
-            B = B + 1
-        if B == 6:
-            B = 0
-            A = A + 1
-        
+    C = (t/10)%10
+    B = (t/100)%6
+    A = t/600
     t = str(A)+ ":" + str(B) + str(C) + "." + str(D)
-    return t
-    
+    return t    
 # define event handlers for buttons; "Start", "Stop", "Reset"
 def start():
-    global time
-    global counter
     timer.start()
 
         
 def stop():
-    global time
-    global counter 
-
+    global counter
+    global stopped_number_whole_second
+    global stopped_number
+    global previous_counter
+    if previous_counter != counter:        
+        if counter%10 ==0:
+            stopped_number_whole_second +=1
+        stopped_number +=1
+        previous_counter = counter
     timer.stop()    
     
 def reset():
     global time
     global counter
-    global A,B,C,D
+    global stopped_number_whole_second
+    global stopped_number
+    global previous_counter
     time = "0:00.0"
     timer.stop()
     counter = 0
-    A = 0
-    B = 0
-    C = 0
-    D = 0
+    stopped_number_whole_second = 0
+    stopped_number = 0
+    previous_counter = 0
     
 # define event handler for timer with 0.1 sec interval
 def tick():
@@ -57,10 +53,11 @@ def tick():
     counter = counter + 1
     time = format(counter)
 
-
 # define draw handler
 def draw_handler(canvas):
     canvas.draw_text(time, (100,150 ), 60, 'White')
+    canvas.draw_text(str(stopped_number_whole_second)+"/", (250, 30), 30, 'Green')
+    canvas.draw_text(str(stopped_number), (270, 30), 30, 'Green')
     
 # create frame
 frame = simplegui.create_frame("StopWatch",300,300)
